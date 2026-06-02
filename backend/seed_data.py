@@ -10,6 +10,7 @@ def seed_database(db):
                 category="Broast",
                 description="1 Leg, 1 Thigh, 1 Dip and 1 Bun served with Fries",
                 price=750,
+                image_url="/static/images/quarter-broast.jpg",
                 is_active=True
             ),
             MenuItem(
