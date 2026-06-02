@@ -10,18 +10,18 @@ class Order(db.Model):
     tracking_number = db.Column(db.String(50), unique=True, nullable=False)
 
     customer_name = db.Column(db.String(150), nullable=False)
-    phone = db.Column(db.String(30), nullable=False)
+    phone = db.Column(db.String(30), nullable=False)  # WhatsApp number
     address = db.Column(db.Text, nullable=True)
+    google_location = db.Column(db.Text, nullable=True)
 
     order_type = db.Column(db.String(50), nullable=False)
     payment_mode = db.Column(db.String(50), nullable=False)
     qr_transaction_id = db.Column(db.String(100), nullable=True)
 
     special_note = db.Column(db.Text, nullable=True)
-
     total_amount = db.Column(db.Integer, nullable=False, default=0)
 
-    status = db.Column(db.String(100), default="Pending Confirmation")
+    status = db.Column(db.String(100), default="Pending")
 
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(
@@ -44,7 +44,9 @@ class Order(db.Model):
             "tracking_number": self.tracking_number,
             "customer_name": self.customer_name,
             "phone": self.phone,
+            "whatsapp_number": self.phone,
             "address": self.address,
+            "google_location": self.google_location,
             "order_type": self.order_type,
             "payment_mode": self.payment_mode,
             "qr_transaction_id": self.qr_transaction_id,

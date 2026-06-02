@@ -11,16 +11,23 @@ def track_order():
     tracking_number = data.get("tracking_number")
     phone = data.get("phone")
 
-    if not tracking_number or not phone:
+    if not tracking_number and not phone:
         return jsonify({
             "success": False,
-            "message": "Tracking number and phone number are required"
+            "message": "Tracking number or WhatsApp number is required"
         }), 400
 
-    order = Order.query.filter_by(
-        tracking_number=tracking_number,
-        phone=phone
-    ).first()
+    query = Order.query
+
+    if tracking_number and phone:
+        order = query.filter_by(
+            tracking_number=tracking_number,
+            phone=phone
+        ).first()
+    elif tracking_number:
+        order = query.filter_by(tracking_number=tracking_number).first()
+    else:
+        order = query.filter_by(phone=phone).order_by(Order.id.desc()).first()
 
     if not order:
         return jsonify({

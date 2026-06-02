@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+
 from database import db
 from models.order_model import Order, OrderItem
 from utils.tracking_generator import generate_tracking_number
@@ -32,11 +33,32 @@ def place_order():
             "message": "Cart is empty"
         }), 400
 
-    if data["payment_mode"] == "QR Payment" and not data.get("qr_transaction_id"):
+    allowed_order_types = ["Delivery", "Takeaway", "Dine-in"]
+    if data["order_type"] not in allowed_order_types:
+        return jsonify({
+            "success": False,
+            "message": "Invalid order type"
+        }), 400
+
+    allowed_payment_modes = ["COD", "Card Payment", "QR Scan"]
+    if data["payment_mode"] not in allowed_payment_modes:
+        return jsonify({
+            "success": False,
+            "message": "Invalid payment mode"
+        }), 400
+
+    if data["payment_mode"] == "QR Scan" and not data.get("qr_transaction_id"):
         return jsonify({
             "success": False,
             "message": "QR Transaction ID is required"
         }), 400
+
+    if data["order_type"] == "Delivery":
+        if not data.get("address") and not data.get("google_location"):
+            return jsonify({
+                "success": False,
+                "message": "Address or Google current location is required for delivery"
+            }), 400
 
     total_amount = 0
 
@@ -44,25 +66,25 @@ def place_order():
         total_amount += int(item["price"]) * int(item["quantity"])
 
     tracking_number = generate_tracking_number()
+    order_number = generate_order_number()
 
     order = Order(
-        order_number="TEMP",
+        order_number=order_number,
         tracking_number=tracking_number,
         customer_name=data["customer_name"],
         phone=data["phone"],
         address=data.get("address"),
+        google_location=data.get("google_location"),
         order_type=data["order_type"],
         payment_mode=data["payment_mode"],
         qr_transaction_id=data.get("qr_transaction_id"),
         special_note=data.get("special_note"),
         total_amount=total_amount,
-        status="Pending Confirmation"
+        status="Pending"
     )
 
     db.session.add(order)
     db.session.flush()
-
-    order.order_number = generate_order_number(order.id)
 
     for item in data["items"]:
         order_item = OrderItem(
@@ -115,7 +137,7 @@ def get_my_orders():
     if not phone:
         return jsonify({
             "success": False,
-            "message": "Phone number is required"
+            "message": "WhatsApp number is required"
         }), 400
 
     orders = Order.query.filter_by(phone=phone).order_by(Order.id.desc()).all()
