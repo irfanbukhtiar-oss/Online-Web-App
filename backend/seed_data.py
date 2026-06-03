@@ -248,24 +248,28 @@ def seed_database(db):
                 name="Spicy Single",
                 items_description="1 Quarter Broast + Fries + Drink (345 ml)",
                 price=850,
+                image_url="/static/images/deal/spicy-single.jpeg",
                 is_active=True
             ),
             Deal(
                 name="Spicy Double",
                 items_description="1 half Broast + Fries + Drink (500 ml)",
                 price=1499,
+                image_url="/static/images/deal/spicy-double.jpeg",
                 is_active=True
             ),
             Deal(
                 name="4 * 4",
                 items_description="1 Full + Fries + Drink (1500 ml)",
                 price=2600,
+                image_url="/static/images/deal/full-broast.jpeg",
                 is_active=True
             ),                        
             Deal(
                 name="Family Deal",
                 items_description="2 Full Broast + Fries + 2  Drinks (1500 ml)",
                 price=4600,
+                image_url="/static/images/deal/family-time.jpeg",
                 is_active=True
             ),
 
@@ -273,18 +277,21 @@ def seed_database(db):
                 name="Deal 2S",
                 items_description="2 Small Pizzas + 2  Drinks (345 ml)",
                 price=950,
+                image_url="/static/images/deal/2S.jpeg",
                 is_active=True
             ),
             Deal(
                 name="=Deal 2M",
                 items_description="2 Medium Pizzas + 2  Drinks (345 ml)",
                 price=1600,
+                image_url="/static/images/deal/2M.jpeg",
                 is_active=True
             ),            
             Deal(
                 name="Deal 2L",
                 items_description="2 Large Pizzas + Drink (1500 ml)",
                 price=2300,
+                image_url="/static/images/deal/2L.jpeg",
                 is_active=True
             ),
 
@@ -292,6 +299,7 @@ def seed_database(db):
                 name="Zinger Deal",
                 items_description="4 Zinger Burgers",
                 price=1000,
+                image_url="/static/images/burger/zinger-burger.jpeg",
                 is_active=True
             )
         ]
