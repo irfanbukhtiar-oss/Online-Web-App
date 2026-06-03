@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   getAllOrders,
   updateOrderStatus,
@@ -7,9 +7,12 @@ import {
 
 function AdminOrders() {
   const [orders, setOrders] = useState([]);
+  const [newOrderAlert, setNewOrderAlert] = useState("");
+  const previousOrderCount = useRef(0);
+  const firstLoad = useRef(true);
 
   const statuses = [
-    "Pending Confirmation",
+    "Pending",
     "Confirmed",
     "Sent to Kitchen",
     "Food Ready",
@@ -18,13 +21,78 @@ function AdminOrders() {
     "Cancelled"
   ];
 
+  const playBeep = () => {
+    const audioContext = new window.AudioContext();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.value = 900;
+    oscillator.type = "sine";
+
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.4);
+  };
+
+  const formatWhatsAppNumber = (phone) => {
+    if (!phone) return "";
+
+    let cleaned = phone.replace(/\D/g, "");
+
+    if (cleaned.startsWith("0")) {
+      cleaned = "92" + cleaned.substring(1);
+    }
+
+    return cleaned;
+  };
+
+  const openCustomerWhatsApp = (order) => {
+    const number = formatWhatsAppNumber(order.phone);
+
+    const message = encodeURIComponent(
+      `Assalam o Alaikum ${order.customer_name}, your Broast Chasers order ${order.order_number} is currently: ${order.status}. Tracking number: ${order.tracking_number}`
+    );
+
+    window.open(`https://wa.me/${number}?text=${message}`, "_blank");
+  };
+
   const loadOrders = async () => {
-    const res = await getAllOrders();
-    setOrders(res.orders || []);
+    try {
+      const res = await getAllOrders();
+      const latestOrders = res.orders || [];
+
+      setOrders(latestOrders);
+
+      if (!firstLoad.current && latestOrders.length > previousOrderCount.current) {
+        playBeep();
+        setNewOrderAlert("New order received!");
+
+        document.title = "New Order - Broast Chasers";
+
+        setTimeout(() => {
+          setNewOrderAlert("");
+          document.title = "Broast Chasers";
+        }, 6000);
+      }
+
+      previousOrderCount.current = latestOrders.length;
+      firstLoad.current = false;
+    } catch (error) {
+      console.error("Orders loading error", error);
+    }
   };
 
   useEffect(() => {
     loadOrders();
+
+    const interval = setInterval(() => {
+      loadOrders();
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleStatusChange = async (orderId, status) => {
@@ -41,6 +109,16 @@ function AdminOrders() {
     <div className="admin-layout">
       <h1>Admin Orders</h1>
 
+      {newOrderAlert && (
+        <div className="new-order-alert">
+          🔔 {newOrderAlert}
+        </div>
+      )}
+
+      <p className="admin-note">
+        Orders auto-refresh every 10 seconds. New orders trigger beep alert.
+      </p>
+
       <div className="table-wrap">
         <table>
           <thead>
@@ -48,26 +126,41 @@ function AdminOrders() {
               <th>Order No.</th>
               <th>Tracking</th>
               <th>Name</th>
-              <th>Phone</th>
+              <th>WhatsApp</th>
               <th>Type</th>
               <th>Payment</th>
               <th>Total</th>
               <th>Status</th>
               <th>Items</th>
+              <th>Address / Location</th>
               <th>Action</th>
             </tr>
           </thead>
 
           <tbody>
             {orders.map((order) => (
-              <tr key={order.id}>
+              <tr
+                key={order.id}
+                className={order.status === "Pending" ? "pending-order-row" : ""}
+              >
                 <td>{order.order_number}</td>
                 <td>{order.tracking_number}</td>
                 <td>{order.customer_name}</td>
-                <td>{order.phone}</td>
+
+                <td>
+                  <div>{order.phone}</div>
+                  <button
+                    className="whatsapp-btn"
+                    onClick={() => openCustomerWhatsApp(order)}
+                  >
+                    WhatsApp
+                  </button>
+                </td>
+
                 <td>{order.order_type}</td>
                 <td>{order.payment_mode}</td>
                 <td>Rs. {order.total_amount}</td>
+
                 <td>
                   <select
                     className="status-select"
@@ -81,6 +174,7 @@ function AdminOrders() {
                     ))}
                   </select>
                 </td>
+
                 <td>
                   {order.items.map((item) => (
                     <div key={item.id}>
@@ -88,6 +182,21 @@ function AdminOrders() {
                     </div>
                   ))}
                 </td>
+
+                <td>
+                  {order.address && <div>{order.address}</div>}
+
+                  {order.google_location && (
+                    <a
+                      href={order.google_location}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Open Location
+                    </a>
+                  )}
+                </td>
+
                 <td>
                   <button onClick={() => handleDelete(order.id)}>
                     Delete

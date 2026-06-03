@@ -10,19 +10,21 @@ function OrderSuccess() {
     <div className="success-box">
       <h2>Order placed successfully</h2>
 
-      <div className="info-line">
-        <strong>Tracking Number:</strong>{" "}
-        {order?.tracking_number || trackingNumber}
-      </div>
+      <div className="success-options">
+        <div className="success-option-card">
+          <h3>Tracking Number</h3>
+          <p>{order?.tracking_number || trackingNumber}</p>
+        </div>
 
-      <div className="info-line">
-        <strong>Order Number:</strong>{" "}
-        {order?.order_number || "Generated"}
-      </div>
+        <div className="success-option-card">
+          <h3>Order Number</h3>
+          <p>{order?.order_number || "Generated"}</p>
+        </div>
 
-      <div className="info-line">
-        <strong>Status:</strong>{" "}
-        {order?.status || "Pending Confirmation"}
+        <div className="success-option-card">
+          <h3>Status</h3>
+          <p>{order?.status || "Pending"}</p>
+        </div>
       </div>
 
       <Link to="/track-order">

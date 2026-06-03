@@ -9,11 +9,11 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
-    "vite": "latest",
+    "axios": "latest",
     "react": "latest",
     "react-dom": "latest",
     "react-router-dom": "latest",
-    "axios": "latest"
-  },
-  "devDependencies": {}
+    "swiper": "^12.2.0",
+    "vite": "latest"
+  }
 }

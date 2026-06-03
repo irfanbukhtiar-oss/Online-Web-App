@@ -10,7 +10,7 @@ def seed_database(db):
                 category="Broast",
                 description="1 Leg, 1 Thigh, 1 Dip and 1 Bun served with Fries",
                 price=750,
-                image_url="/static/images/quarter-broast.jpg",
+                image_url="/static/images/broast/quarter-broast.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -18,6 +18,7 @@ def seed_database(db):
                 category="Broast",
                 description="2 Legs, 2 Thighs, 2 Dips and 1 Bun served with Fries",
                 price=1299,
+                image_url="/static/images/broast/half-broast.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -25,6 +26,7 @@ def seed_database(db):
                 category="Broast",
                 description="4 Legs, 4 Thighs, 3 Dips and 2 Buns served with Fries",
                 price=2480,
+                image_url="/static/images/broast/full-broast.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -32,6 +34,7 @@ def seed_database(db):
                 category="Burger",
                 description="Thigh piece, bun, burger sauce and iceberg, served with Fries",
                 price=500,
+                image_url="/static/images/burger/zinger-burger.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -39,6 +42,7 @@ def seed_database(db):
                 category="Burger",
                 description="Thigh piece injected with spicy sauce, bun, burger sauce and iceberg, served with Fries",
                 price=600,
+                image_url="/static/images/burger/Injected-zinger.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -46,6 +50,7 @@ def seed_database(db):
                 category="Burger",
                 description="Crispy chicken injected with spicy sauce, bun, burger sauce and iceberg, served with Fries",
                 price=600,
+                image_url="/static/images/burger/crunch-blast.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -53,6 +58,7 @@ def seed_database(db):
                 category="Burger",
                 description="2 thigh pieces, bun, burger sauce and iceberg, served with Fries",
                 price=750,
+                image_url="/static/images/burger/mighty-zinger.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -60,6 +66,7 @@ def seed_database(db):
                 category="Sandwich",
                 description="3 Bread Slice, Tikka Chicken, Vegetable, Sandwich Sauce, served with Fries",
                 price=500,
+                image_url="/static/images/sandwich/club-sandwich.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -67,6 +74,7 @@ def seed_database(db):
                 category="Sandwich",
                 description="4 Bread Slice, Tikka Chicken, Egg, Vegetable, Sandwich Sauce, served with Fries",
                 price=500,
+                image_url="/static/images/sandwich/tikka-sandwich.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -74,6 +82,7 @@ def seed_database(db):
                 category="Pizza",
                 description="Tikka Chicken, Vegetable, Pizza Sauce",
                 price=550,
+                image_url="/static/images/pizza/pizza-small.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -81,6 +90,7 @@ def seed_database(db):
                 category="Pizza",
                 description="Tikka Chicken, Vegetable, Pizza Sauce",
                 price=1050,
+                image_url="/static/images/pizza/pizza-medium.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -88,6 +98,7 @@ def seed_database(db):
                 category="Pizza",
                 description="Tikka Chicken, Vegetable, Pizza Sauce",
                 price=1450,
+                image_url="/static/images/pizza/pizza-Large.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -95,6 +106,7 @@ def seed_database(db):
                 category="Pizza",
                 description="Supreme Chicken, Vegetable, Pizza Sauce",
                 price=600,
+                image_url="/static/images/pizza/pizza-small.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -102,6 +114,7 @@ def seed_database(db):
                 category="Pizza",
                 description="Supreme Chicken, Vegetable, Pizza Sauce",
                 price=1150,
+                image_url="/static/images/pizza/pizza-medium.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -109,6 +122,7 @@ def seed_database(db):
                 category="Pizza",
                 description="Supreme Chicken, Vegetable, Pizza Sauce",
                 price=1550,
+                image_url="/static/images/pizza/pizza-Large.jpeg",
                 is_active=True
             ),                                                           
             MenuItem(
@@ -116,6 +130,7 @@ def seed_database(db):
                 category="Pizza",
                 description="Malai Boti Chicken, Vegetable, Pizza Sauce",
                 price=600,
+                image_url="/static/images/pizza/pizza-small.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -123,6 +138,7 @@ def seed_database(db):
                 category="Pizza",
                 description="Malai Boti Chicken, Vegetable, Pizza Sauce",
                 price=1150,
+                image_url="/static/images/pizza/pizza-medium.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -130,6 +146,7 @@ def seed_database(db):
                 category="Pizza",
                 description="Malai Boti Chicken, Vegetable, Pizza Sauce",
                 price=1550,
+                image_url="/static/images/pizza/pizza-Large.jpeg",
                 is_active=True
             ),                                                           
             MenuItem(
@@ -137,6 +154,7 @@ def seed_database(db):
                 category="Wrap",
                 description="Tortilla Bread, Chicken, Vegetable, Sauce, served with Fries",
                 price=550,
+                image_url="/static/images/wrap/zinger-wrap.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -144,6 +162,7 @@ def seed_database(db):
                 category="Wrap",
                 description="Tortilla Bread, Chicken, Vegetable, Sauce, served with Fries",
                 price=650,
+                image_url="/static/images/wrap/special-wrap.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -151,6 +170,7 @@ def seed_database(db):
                 category="Wrap",
                 description="Tortilla Bread, Chicken, Vegetable, Sauce, served with Fries",
                 price=800,
+                image_url="/static/images/wrap/chasers-special.jpeg",
                 is_active=True
             ),
 
@@ -159,6 +179,7 @@ def seed_database(db):
                 category="Fries",
                 description="Plain Fries",
                 price=300,
+                image_url="/static/images/fries/plain-half.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -166,6 +187,7 @@ def seed_database(db):
                 category="Fries",
                 description="Plain Fries",
                 price=400,
+                image_url="/static/images/fries/plain-full.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -173,6 +195,7 @@ def seed_database(db):
                 category="Fries",
                 description="Masla Fries",
                 price=350,
+                image_url="/static/images/fries/masla-half.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -180,6 +203,7 @@ def seed_database(db):
                 category="Fries",
                 description="Masla Fries",
                 price=450,
+                image_url="/static/images/fries/masla-full.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -187,6 +211,7 @@ def seed_database(db):
                 category="Fries",
                 description="Plain Fries, Chicken, Sauce, Vegetable",
                 price=550,
+                image_url="/static/images/fries/loaded-half.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -194,6 +219,7 @@ def seed_database(db):
                 category="Fries",
                 description="Plain Fries, Chicken, Sauce, Vegetable",
                 price=750,
+                image_url="/static/images/fries/loaded-full.jpeg",
                 is_active=True
             ), 
             MenuItem(
@@ -201,6 +227,7 @@ def seed_database(db):
                 category="Sides",
                 description="Chicken Strips",
                 price=550,
+                image_url="/static/images/sides/chicken-strips.jpeg",
                 is_active=True
             ),
             MenuItem(
@@ -208,6 +235,7 @@ def seed_database(db):
                 category="Sides",
                 description="Nuggets",
                 price=500,
+                image_url="/static/images/sides/nuggets.jpeg",
                 is_active=True
             )
         ]

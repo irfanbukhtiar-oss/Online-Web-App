@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 import MenuItemCard from "../components/MenuItemCard";
 import DealCard from "../components/DealCard";
@@ -8,11 +9,15 @@ import { getActiveMenuItems } from "../services/menuService";
 import { getActiveDeals } from "../services/dealService";
 
 function MenuDeals() {
+  const location = useLocation();
+
   const [menuItems, setMenuItems] = useState([]);
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const categoryRefs = useRef({});
+  const dealsRef = useRef(null);
+  const menuRef = useRef(null);
 
   const loadData = async () => {
     try {
@@ -30,16 +35,27 @@ function MenuDeals() {
 
   useEffect(() => {
     loadData();
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
 
     setTimeout(() => {
-      if (window.location.hash) {
-        const section = document.querySelector(window.location.hash);
-        if (section) {
-          section.scrollIntoView({ behavior: "smooth" });
-        }
+      if (location.hash === "#deals" && dealsRef.current) {
+        dealsRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      }
+
+      if (location.hash === "#menu" && menuRef.current) {
+        menuRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
       }
     }, 300);
-  }, []);
+  }, [location.hash, loading, menuItems, deals]);
 
   const groupedMenu = useMemo(() => {
     return menuItems.reduce((groups, item) => {
@@ -50,6 +66,7 @@ function MenuDeals() {
       }
 
       groups[category].push(item);
+
       return groups;
     }, {});
   }, [menuItems]);
@@ -67,6 +84,15 @@ function MenuDeals() {
     }
   };
 
+  const scrollToDeals = () => {
+    if (dealsRef.current) {
+      dealsRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+  };
+
   if (loading) {
     return <div className="section">Loading menu...</div>;
   }
@@ -74,7 +100,7 @@ function MenuDeals() {
   return (
     <div className="menu-layout">
       <div>
-        <section id="menu">
+        <section id="menu" ref={menuRef}>
           <h1 className="menu-section-title">Menu</h1>
 
           <div className="category-tabs sticky-category-tabs">
@@ -87,6 +113,10 @@ function MenuDeals() {
                 {category}
               </button>
             ))}
+
+            <button className="category-btn deals-tab-btn" onClick={scrollToDeals}>
+              Deals
+            </button>
           </div>
 
           {categories.length === 0 ? (
@@ -112,7 +142,7 @@ function MenuDeals() {
           )}
         </section>
 
-        <section id="deals">
+        <section id="deals" ref={dealsRef} className="category-block">
           <h1 className="menu-section-title">Deals</h1>
 
           <div className="product-grid">

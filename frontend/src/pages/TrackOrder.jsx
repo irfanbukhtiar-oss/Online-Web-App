@@ -12,6 +12,11 @@ function TrackOrder() {
     setError("");
     setOrder(null);
 
+    if (!trackingNumber && !phone) {
+      setError("Enter tracking number or WhatsApp number.");
+      return;
+    }
+
     try {
       const res = await trackOrder({
         tracking_number: trackingNumber,
@@ -37,16 +42,15 @@ function TrackOrder() {
             value={trackingNumber}
             onChange={(e) => setTrackingNumber(e.target.value)}
             placeholder="TRK-482913"
-            required
           />
         </div>
 
         <div className="form-group">
-          <label>Phone Number</label>
+          <label>WhatsApp Number</label>
           <input
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            required
+            placeholder="03001234567"
           />
         </div>
 
@@ -62,9 +66,28 @@ function TrackOrder() {
           <h3>{order.order_number}</h3>
           <p><strong>Tracking:</strong> {order.tracking_number}</p>
           <p><strong>Name:</strong> {order.customer_name}</p>
-          <p><strong>Phone:</strong> {order.phone}</p>
+          <p><strong>WhatsApp:</strong> {order.phone}</p>
+          <p><strong>Order Type:</strong> {order.order_type}</p>
+          <p><strong>Payment:</strong> {order.payment_mode}</p>
           <p><strong>Status:</strong> {order.status}</p>
           <p><strong>Total:</strong> Rs. {order.total_amount}</p>
+
+          {order.address && (
+            <p><strong>Address:</strong> {order.address}</p>
+          )}
+
+          {order.google_location && (
+            <p>
+              <strong>Google Location:</strong>{" "}
+              <a
+                href={order.google_location}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open Location
+              </a>
+            </p>
+          )}
 
           <h4>Items</h4>
           {order.items.map((item) => (
