@@ -5,9 +5,16 @@ import {
   deleteOrder
 } from "../../services/orderService";
 
+import {
+  createOrderConfirmationMessage,
+  createStatusUpdateMessage,
+  openWhatsAppMessage
+} from "../../services/whatsappUtils";
+
 function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [newOrderAlert, setNewOrderAlert] = useState("");
+
   const previousOrderCount = useRef(0);
   const firstLoad = useRef(true);
 
@@ -37,28 +44,6 @@ function AdminOrders() {
     oscillator.stop(audioContext.currentTime + 0.4);
   };
 
-  const formatWhatsAppNumber = (phone) => {
-    if (!phone) return "";
-
-    let cleaned = phone.replace(/\D/g, "");
-
-    if (cleaned.startsWith("0")) {
-      cleaned = "92" + cleaned.substring(1);
-    }
-
-    return cleaned;
-  };
-
-  const openCustomerWhatsApp = (order) => {
-    const number = formatWhatsAppNumber(order.phone);
-
-    const message = encodeURIComponent(
-      `Assalam o Alaikum ${order.customer_name}, your Broast Chasers order ${order.order_number} is currently: ${order.status}. Tracking number: ${order.tracking_number}`
-    );
-
-    window.open(`https://wa.me/${number}?text=${message}`, "_blank");
-  };
-
   const loadOrders = async () => {
     try {
       const res = await getAllOrders();
@@ -69,7 +54,6 @@ function AdminOrders() {
       if (!firstLoad.current && latestOrders.length > previousOrderCount.current) {
         playBeep();
         setNewOrderAlert("New order received!");
-
         document.title = "New Order - Broast Chasers";
 
         setTimeout(() => {
@@ -105,6 +89,16 @@ function AdminOrders() {
     loadOrders();
   };
 
+  const sendConfirmation = (order) => {
+    const message = createOrderConfirmationMessage(order);
+    openWhatsAppMessage(order.phone, message);
+  };
+
+  const sendStatusUpdate = (order) => {
+    const message = createStatusUpdateMessage(order);
+    openWhatsAppMessage(order.phone, message);
+  };
+
   return (
     <div className="admin-layout">
       <h1>Admin Orders</h1>
@@ -133,6 +127,7 @@ function AdminOrders() {
               <th>Status</th>
               <th>Items</th>
               <th>Address / Location</th>
+              <th>WhatsApp Message</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -146,17 +141,7 @@ function AdminOrders() {
                 <td>{order.order_number}</td>
                 <td>{order.tracking_number}</td>
                 <td>{order.customer_name}</td>
-
-                <td>
-                  <div>{order.phone}</div>
-                  <button
-                    className="whatsapp-btn"
-                    onClick={() => openCustomerWhatsApp(order)}
-                  >
-                    WhatsApp
-                  </button>
-                </td>
-
+                <td>{order.phone}</td>
                 <td>{order.order_type}</td>
                 <td>{order.payment_mode}</td>
                 <td>Rs. {order.total_amount}</td>
@@ -195,6 +180,22 @@ function AdminOrders() {
                       Open Location
                     </a>
                   )}
+                </td>
+
+                <td>
+                  <button
+                    className="whatsapp-btn"
+                    onClick={() => sendConfirmation(order)}
+                  >
+                    Send Confirmation
+                  </button>
+
+                  <button
+                    className="whatsapp-secondary-btn"
+                    onClick={() => sendStatusUpdate(order)}
+                  >
+                    Send Status
+                  </button>
                 </td>
 
                 <td>
