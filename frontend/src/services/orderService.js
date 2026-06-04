@@ -5,8 +5,21 @@ export const placeOrder = async (data) => {
   return res.data;
 };
 
-export const getAllOrders = async () => {
-  const res = await api.get("/admin/orders");
+export const getAllOrders = async (date = "") => {
+  const url = date ? `/admin/orders?date=${date}` : "/admin/orders";
+  const res = await api.get(url);
+  return res.data;
+};
+
+export const getDashboardStats = async (date = "") => {
+  const url = date ? `/admin/dashboard?date=${date}` : "/admin/dashboard";
+  const res = await api.get(url);
+  return res.data;
+};
+
+export const getSalesReport = async (date = "") => {
+  const url = date ? `/admin/sales-report?date=${date}` : "/admin/sales-report";
+  const res = await api.get(url);
   return res.data;
 };
 
