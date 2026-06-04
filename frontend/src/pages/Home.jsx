@@ -19,6 +19,8 @@ import "swiper/css/effect-coverflow";
 import "swiper/css/effect-cards";
 
 import logo from "../assets/logo.png";
+import heroBg from "../assets/hero-bg.jpg";
+
 import ChatbotAssistant from "../components/ChatbotAssistant";
 
 import { getActiveMenuItems } from "../services/menuService";
@@ -29,10 +31,77 @@ function Home() {
   const [menuItems, setMenuItems] = useState([]);
   const [deals, setDeals] = useState([]);
 
+  /*
+    Only these menu items will show in Featured Menu slider.
+    Names must match backend item names exactly.
+  */
+  const featuredMenuNames = [
+    "Quarter Broast",
+    "Half Broast",
+    "Full Broast",
+    "Zinger Burger",
+    "Injected Zinger Burger",
+    "Crunch Blast Burger",
+    "Mighty Zinger Burger",
+    "Loaded Fries"
+  ];
+
+  /*
+    Only these deals will show in Deals & Promotions slider.
+    Names must match backend deal names exactly.
+  */
+  const featuredDealNames = [
+    "Deal 1",
+    "Family Deal",
+    "Zinger Deal"
+  ];
+
+  /*
+    Hero slider can use custom slides.
+    These images must exist inside backend/static/images/hero/
+  */
+  const customHeroSlides = [
+    {
+      id: "hero-1",
+      title: "Quarter Broast",
+      subtitle: "Crispy broast served with fries, bun and dip",
+      price: "Rs. 750",
+      image: "/static/images/broast/quarter-broast.jpeg",
+      link: "/menu-deals#menu",
+      badge: "Broast"
+    },
+    {
+      id: "hero-2",
+      title: "Injected Zinger Burger",
+      subtitle: "Thigh piece injected with spicy sauce",
+      price: "Rs. 600",
+      image: "/static/images/burger/zinger-burger.jpeg",
+      link: "/menu-deals#menu",
+      badge: "Burger"
+    },
+    {
+      id: "hero-3",
+      title: "Family Deal",
+      subtitle: "Perfect meal deal for family sharing",
+      price: "Rs. 2499",
+      image: "/static/images/broast/full-broast.jpeg",
+      link: "/menu-deals#deals",
+      badge: "Deal"
+    }
+  ];
+
   const getImageUrl = (imageUrl) => {
-    if (!imageUrl) return "/src/assets/hero-bg.jpg";
-    if (imageUrl.startsWith("http")) return imageUrl;
-    return `${API_ORIGIN}${imageUrl}`;
+    if (!imageUrl) return heroBg;
+
+    if (imageUrl.startsWith("http")) {
+      return imageUrl;
+    }
+
+    if (imageUrl.startsWith("/static")) {
+      return `${API_ORIGIN}${imageUrl}`;
+    }
+
+    return imageUrl;
   };
 
   useEffect(() => {
@@ -51,52 +120,24 @@ function Home() {
     loadHomeData();
   }, []);
 
+  const featuredMenuItems = useMemo(() => {
+    return menuItems.filter((item) =>
+      featuredMenuNames.includes(item.name)
+    );
+  }, [menuItems]);
+
+  const featuredDeals = useMemo(() => {
+    return deals.filter((deal) =>
+      featuredDealNames.includes(deal.name)
+    );
+  }, [deals]);
+
   const heroSlides = useMemo(() => {
-    const menuSlides = menuItems.slice(0, 4).map((item) => ({
-      id: `menu-${item.id}`,
-      title: item.name,
-      subtitle: item.description || "Freshly prepared Broast Chasers item",
-      price: `Rs. ${item.price}`,
-      image: getImageUrl(item.image_url),
-      link: "/menu-deals#menu",
-      badge: item.category || "Menu"
+    return customHeroSlides.map((slide) => ({
+      ...slide,
+      image: getImageUrl(slide.image)
     }));
-
-    const dealSlides = deals.slice(0, 2).map((deal) => ({
-      id: `deal-${deal.id}`,
-      title: deal.name,
-      subtitle: deal.items_description || "Special Broast Chasers deal",
-      price: `Rs. ${deal.price}`,
-      image: getImageUrl(deal.image_url),
-      link: "/menu-deals#deals",
-      badge: "Deal"
-    }));
-
-    const allSlides = [...menuSlides, ...dealSlides];
-
-    if (allSlides.length > 0) return allSlides;
-
-    return [
-      {
-        id: "default-1",
-        title: "Quarter Broast",
-        subtitle: "Crispy broast served with fries, bun and dip",
-        price: "Rs. 750",
-        image: "/src/assets/hero-bg.jpg",
-        link: "/menu-deals#menu",
-        badge: "Broast"
-      },
-      {
-        id: "default-2",
-        title: "Family Deal",
-        subtitle: "Perfect meal deal for family sharing",
-        price: "Rs. 2499",
-        image: "/src/assets/hero-bg.jpg",
-        link: "/menu-deals#deals",
-        badge: "Deal"
-      }
-    ];
-  }, [menuItems, deals]);
+  }, []);
 
   return (
     <>
@@ -105,8 +146,8 @@ function Home() {
         <Swiper
           modules={[Autoplay, Navigation, Pagination, EffectFade]}
           effect="fade"
-          loop
-          navigation
+          loop={heroSlides.length > 1}
+          navigation={heroSlides.length > 1}
           pagination={{ clickable: true }}
           autoplay={{
             delay: 4000,
@@ -124,7 +165,11 @@ function Home() {
                 }}
               >
                 <div className="premium-hero-content">
-                  <img src={logo} alt="Broast Chasers Logo" className="hero-logo" />
+                  <img
+                    src={logo}
+                    alt="Broast Chasers Logo"
+                    className="hero-logo"
+                  />
 
                   <span className="slider-badge">{slide.badge}</span>
 
@@ -153,48 +198,52 @@ function Home() {
           </Link>
         </div>
 
-        <Swiper
-          modules={[Autoplay, Navigation, Pagination, EffectCoverflow]}
-          effect="coverflow"
-          grabCursor
-          centeredSlides
-          loop
-          navigation
-          pagination={{ clickable: true }}
-          slidesPerView="auto"
-          autoplay={{
-            delay: 3000,
-            disableOnInteraction: false
-          }}
-          coverflowEffect={{
-            rotate: 25,
-            stretch: 0,
-            depth: 160,
-            modifier: 1,
-            slideShadows: true
-          }}
-          className="menu-coverflow-swiper"
-        >
-          {menuItems.map((item) => (
-            <SwiperSlide key={item.id} className="coverflow-slide">
-              <Link to="/menu-deals#menu" className="coverflow-card">
-                <div
-                  className="coverflow-img"
-                  style={{
-                    backgroundImage: `url(${getImageUrl(item.image_url)})`
-                  }}
-                ></div>
+        {featuredMenuItems.length === 0 ? (
+          <p>No featured menu items found. Check item names in Home.jsx.</p>
+        ) : (
+          <Swiper
+            modules={[Autoplay, Navigation, Pagination, EffectCoverflow]}
+            effect="coverflow"
+            grabCursor
+            centeredSlides
+            loop={featuredMenuItems.length > 3}
+            navigation={featuredMenuItems.length > 1}
+            pagination={{ clickable: true }}
+            slidesPerView="auto"
+            autoplay={{
+              delay: 3000,
+              disableOnInteraction: false
+            }}
+            coverflowEffect={{
+              rotate: 25,
+              stretch: 0,
+              depth: 160,
+              modifier: 1,
+              slideShadows: true
+            }}
+            className="menu-coverflow-swiper"
+          >
+            {featuredMenuItems.map((item) => (
+              <SwiperSlide key={item.id} className="coverflow-slide">
+                <Link to="/menu-deals#menu" className="coverflow-card">
+                  <div
+                    className="coverflow-img"
+                    style={{
+                      backgroundImage: `url(${getImageUrl(item.image_url)})`
+                    }}
+                  ></div>
 
-                <div className="coverflow-content">
-                  <span>{item.category}</span>
-                  <h3>{item.name}</h3>
-                  <p>{item.description}</p>
-                  <strong>Rs. {item.price}</strong>
-                </div>
-              </Link>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+                  <div className="coverflow-content">
+                    <span>{item.category}</span>
+                    <h3>{item.name}</h3>
+                    <p>{item.description}</p>
+                    <strong>Rs. {item.price}</strong>
+                  </div>
+                </Link>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
       </section>
 
       {/* DEALS CARDS SLIDER */}
@@ -207,39 +256,44 @@ function Home() {
           </Link>
         </div>
 
-        <div className="deals-cards-wrap">
-          <Swiper
-            modules={[Autoplay, EffectCards]}
-            effect="cards"
-            grabCursor
-            loop
-            autoplay={{
-              delay: 3200,
-              disableOnInteraction: false
-            }}
-            className="deals-cards-swiper"
-          >
-            {deals.map((deal) => (
-              <SwiperSlide key={deal.id}>
-                <Link to="/menu-deals#deals" className="deal-stack-card">
-                  <div
-                    className="deal-stack-image"
-                    style={{
-                      backgroundImage: `url(${getImageUrl(deal.image_url)})`
-                    }}
-                  ></div>
+        {featuredDeals.length === 0 ? (
+          <p>No featured deals found. Check deal names in Home.jsx.</p>
+        ) : (
+          <div className="deals-cards-wrap">
+            <Swiper
+              modules={[Autoplay, EffectCards, Pagination]}
+              effect="cards"
+              grabCursor
+              loop={featuredDeals.length > 1}
+              pagination={{ clickable: true }}
+              autoplay={{
+                delay: 3200,
+                disableOnInteraction: false
+              }}
+              className="deals-cards-swiper"
+            >
+              {featuredDeals.map((deal) => (
+                <SwiperSlide key={deal.id}>
+                  <Link to="/menu-deals#deals" className="deal-stack-card">
+                    <div
+                      className="deal-stack-image"
+                      style={{
+                        backgroundImage: `url(${getImageUrl(deal.image_url)})`
+                      }}
+                    ></div>
 
-                  <div className="deal-stack-content">
-                    <span>Special Deal</span>
-                    <h3>{deal.name}</h3>
-                    <p>{deal.items_description}</p>
-                    <strong>Rs. {deal.price}</strong>
-                  </div>
-                </Link>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
+                    <div className="deal-stack-content">
+                      <span>Special Deal</span>
+                      <h3>{deal.name}</h3>
+                      <p>{deal.items_description}</p>
+                      <strong>Rs. {deal.price}</strong>
+                    </div>
+                  </Link>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+        )}
       </section>
 
       <ChatbotAssistant />

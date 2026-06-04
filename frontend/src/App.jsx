@@ -16,6 +16,9 @@ import MyOrders from "./pages/MyOrder";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import MenuSettings from "./pages/admin/MenuSettings";
 import AdminOrders from "./pages/admin/AdminOrders";
+import AdminReports from "./pages/admin/AdminReports";
+import AdminUsers from "./pages/admin/AdminUsers";
+import UserProfile from "./pages/admin/UserProfile";
 
 function App() {
   return (
@@ -25,30 +28,15 @@ function App() {
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Home />} />
-
           <Route path="/menu-deals" element={<MenuDeals />} />
-
           <Route path="/checkout" element={<Checkout />} />
-
           <Route
             path="/order-success/:trackingNumber"
             element={<OrderSuccess />}
           />
-
-          <Route
-            path="/track-order"
-            element={<TrackOrder />}
-          />
-
-          <Route
-            path="/contact"
-            element={<Contact />}
-          />
-
-          <Route
-            path="/login"
-            element={<Login />}
-          />
+          <Route path="/track-order" element={<TrackOrder />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/login" element={<Login />} />
 
           <Route
             path="/my-orders"
@@ -82,6 +70,42 @@ function App() {
             element={
               <ProtectedRoute adminOnly={true}>
                 <AdminOrders />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/reports"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <AdminReports />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <AdminUsers />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/users/new"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <UserProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/users/:id"
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <UserProfile />
               </ProtectedRoute>
             }
           />
