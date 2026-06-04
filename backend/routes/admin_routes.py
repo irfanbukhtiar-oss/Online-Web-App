@@ -31,11 +31,14 @@ def get_date_range():
     except ValueError:
         return "INVALID", "INVALID"
 
-    start_datetime = datetime.combine(selected_date, time.min)
-    end_datetime = datetime.combine(selected_date, time.max)
+    # Pakistan time UTC+5
+    local_start = datetime.combine(selected_date, time.min)
+    local_end = datetime.combine(selected_date, time.max)
 
-    return start_datetime, end_datetime
+    utc_start = local_start - timedelta(hours=5)
+    utc_end = local_end - timedelta(hours=5)
 
+    return utc_start, utc_end
 
 def apply_date_filter(query):
     start_datetime, end_datetime = get_date_range()
