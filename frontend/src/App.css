@@ -440,9 +440,9 @@ button {
 }
 
 .qr-image {
-  width: 220px;
-  height: 220px;
-  object-fit: contain;
+  max-width: 350px;
+  width: 100%;
+  height: auto;
 }
 
 .success-box {

@@ -60,13 +60,25 @@ def create_default_admin():
     if not admin:
         admin = User(
             username="admin",
-            role="admin"
+            full_name="System Admin",
+            email="admin@broastchasers.com",
+            contact="03071117869",
+            role="Admin",
+            assigned_branches="BROAST CHASERS",
+            default_branch="BROAST CHASERS",
+            is_active=True
         )
+
         admin.set_password("admin123")
 
         db.session.add(admin)
         db.session.commit()
-
+    else:
+        admin.role = "Admin"
+        admin.is_active = True
+        admin.set_password("admin123")
+        db.session.commit()
+        
 app = create_app()
 
 if __name__ == "__main__":

@@ -19,10 +19,11 @@ function UserProfile() {
     email: "",
     password: "",
     contact: "",
+    role: "Manager",
     assigned_branches: "BROAST CHASERS",
     default_branch: "BROAST CHASERS",
-    role: "Order Taker",
     discount_cap: 0,
+
     wrap_categories: false,
     tablet_user: false,
     show_category_first: false,
@@ -31,6 +32,7 @@ function UserProfile() {
     show_payment_section_on_tablet: false,
     pos_quick_service: false,
     quick_pos_quantity_selection: false,
+
     is_active: true
   });
 
@@ -60,10 +62,11 @@ function UserProfile() {
           email: user.email || "",
           password: "",
           contact: user.contact || "",
+          role: user.role || "Manager",
           assigned_branches: user.assigned_branches || "BROAST CHASERS",
           default_branch: user.default_branch || "BROAST CHASERS",
-          role: user.role || "Order Taker",
           discount_cap: user.discount_cap || 0,
+
           wrap_categories: Boolean(user.wrap_categories),
           tablet_user: Boolean(user.tablet_user),
           show_category_first: Boolean(user.show_category_first),
@@ -78,10 +81,11 @@ function UserProfile() {
           quick_pos_quantity_selection: Boolean(
             user.quick_pos_quantity_selection
           ),
+
           is_active: Boolean(user.is_active)
         });
       } catch (error) {
-        console.error("User load error", error);
+        console.error("User load error:", error);
         alert("Failed to load user.");
       } finally {
         setLoading(false);
@@ -98,7 +102,12 @@ function UserProfile() {
     }
 
     if (!isEditMode && !form.password.trim()) {
-      alert("Password is required for new user.");
+      alert("Password is required.");
+      return false;
+    }
+
+    if (!form.role.trim()) {
+      alert("Role is required.");
       return false;
     }
 
@@ -110,32 +119,6 @@ function UserProfile() {
     return true;
   };
 
-  const buildPayload = () => {
-    return {
-      username: form.username.trim(),
-      password: form.password,
-      full_name: form.full_name,
-      email: form.email,
-      contact: form.contact,
-      role: form.role,
-      assigned_branches: form.assigned_branches,
-      default_branch: form.default_branch,
-      discount_cap: Number(form.discount_cap || 0),
-      wrap_categories: form.wrap_categories,
-      tablet_user: form.tablet_user,
-      show_category_first: form.show_category_first,
-      show_service_charges_on_tablet:
-        form.show_service_charges_on_tablet,
-      tax_verified: form.tax_verified,
-      show_payment_section_on_tablet:
-        form.show_payment_section_on_tablet,
-      pos_quick_service: form.pos_quick_service,
-      quick_pos_quantity_selection:
-        form.quick_pos_quantity_selection,
-      is_active: form.is_active
-    };
-  };
-
   const handleSave = async (e) => {
     e.preventDefault();
 
@@ -144,7 +127,34 @@ function UserProfile() {
     try {
       setSaving(true);
 
-      const payload = buildPayload();
+      const payload = {
+        username: form.username.trim(),
+        full_name: form.full_name.trim(),
+        email: form.email.trim(),
+        contact: form.contact.trim(),
+        role: form.role,
+        assigned_branches: form.assigned_branches,
+        default_branch: form.default_branch,
+        discount_cap: Number(form.discount_cap || 0),
+
+        wrap_categories: form.wrap_categories,
+        tablet_user: form.tablet_user,
+        show_category_first: form.show_category_first,
+        show_service_charges_on_tablet:
+          form.show_service_charges_on_tablet,
+        tax_verified: form.tax_verified,
+        show_payment_section_on_tablet:
+          form.show_payment_section_on_tablet,
+        pos_quick_service: form.pos_quick_service,
+        quick_pos_quantity_selection:
+          form.quick_pos_quantity_selection,
+
+        is_active: form.is_active
+      };
+
+      if (form.password.trim()) {
+        payload.password = form.password.trim();
+      }
 
       if (isEditMode) {
         await updateUser(id, payload);
@@ -156,11 +166,11 @@ function UserProfile() {
 
       navigate("/admin/users");
     } catch (error) {
-      console.error("User save error", error);
+      console.error("User save error:", error);
 
       alert(
         error?.response?.data?.message ||
-          "Failed to save user."
+          "Failed to save user. Check backend API."
       );
     } finally {
       setSaving(false);
@@ -182,7 +192,7 @@ function UserProfile() {
 
         <div>
           <h1>{isEditMode ? "User Profile" : "Add User"}</h1>
-          <p>Manage account details and access privileges.</p>
+          <p>Manage account details, role, and privileges.</p>
         </div>
       </div>
 
@@ -194,68 +204,76 @@ function UserProfile() {
               <span>Account Information</span>
             </div>
 
+            <label>Username</label>
             <input
-              placeholder="Username"
               value={form.username}
               onChange={(e) => updateField("username", e.target.value)}
+              placeholder="manager1"
               required
             />
 
+            <label>Full Name</label>
             <input
-              placeholder="Full Name"
               value={form.full_name}
               onChange={(e) => updateField("full_name", e.target.value)}
+              placeholder="Manager Name"
             />
 
+            <label>Email</label>
             <input
-              placeholder="Email"
               type="email"
               value={form.email}
               onChange={(e) => updateField("email", e.target.value)}
+              placeholder="manager@example.com"
             />
 
+            <label>Password</label>
             <input
-              placeholder={
-                isEditMode
-                  ? "New Password - leave blank to keep current"
-                  : "Password"
-              }
               type="password"
               value={form.password}
               onChange={(e) => updateField("password", e.target.value)}
+              placeholder={
+                isEditMode
+                  ? "Leave blank to keep current password"
+                  : "Enter password"
+              }
               required={!isEditMode}
             />
 
+            <label>Contact</label>
             <input
-              placeholder="Contact"
               value={form.contact}
               onChange={(e) => updateField("contact", e.target.value)}
+              placeholder="03000000000"
             />
 
+            <label>Role</label>
             <select
               value={form.role}
               onChange={(e) => updateField("role", e.target.value)}
             >
-              <option>Admin</option>
-              <option>Manager</option>
-              <option>Order Taker</option>
-              <option>Rider</option>
+              <option value="Admin">Admin</option>
+              <option value="Manager">Manager</option>
+              <option value="Order Taker">Order Taker</option>
+              <option value="Rider">Rider</option>
             </select>
 
+            <label>Assigned Branches</label>
             <input
-              placeholder="Assigned Branches"
               value={form.assigned_branches}
               onChange={(e) =>
                 updateField("assigned_branches", e.target.value)
               }
+              placeholder="BROAST CHASERS"
             />
 
+            <label>Default Branch</label>
             <input
-              placeholder="Default Branch"
               value={form.default_branch}
               onChange={(e) =>
                 updateField("default_branch", e.target.value)
               }
+              placeholder="BROAST CHASERS"
               required
             />
 
@@ -395,11 +413,7 @@ function UserProfile() {
             </button>
           </Link>
 
-          <button
-            type="submit"
-            className="primary-btn"
-            disabled={saving}
-          >
+          <button type="submit" className="primary-btn" disabled={saving}>
             {saving ? "Saving..." : "Save Changes"}
           </button>
         </div>

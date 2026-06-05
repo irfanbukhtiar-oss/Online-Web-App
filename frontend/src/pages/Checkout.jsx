@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useCart } from "../context/CartContext";
 import { placeOrder } from "../services/orderService";
-import qrPayment from "../assets/qr-payment.png";
+import qrPayment from "../assets/qr-payment.jpeg";
 
 function Checkout() {
   const navigate = useNavigate();

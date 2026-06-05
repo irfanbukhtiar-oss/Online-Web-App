@@ -8,18 +8,18 @@ function ProtectedRoute({ children, adminOnly = false, allowedRoles = [] }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (adminOnly && user.role !== "admin" && user.role !== "Admin") {
+  const userRole = user.role?.toLowerCase();
+
+  if (adminOnly && userRole !== "admin") {
     return <Navigate to="/" replace />;
   }
 
   if (allowedRoles.length > 0) {
-    const userRole = user.role?.toLowerCase();
+    const normalizedAllowedRoles = allowedRoles.map((role) =>
+      role.toLowerCase()
+    );
 
-    const hasAccess = allowedRoles
-      .map((role) => role.toLowerCase())
-      .includes(userRole);
-
-    if (!hasAccess) {
+    if (!normalizedAllowedRoles.includes(userRole)) {
       return <Navigate to="/" replace />;
     }
   }

@@ -5,6 +5,11 @@ import logo from "../assets/logo.png";
 function Navbar() {
   const { user, logout } = useAuth();
 
+  const userRole = user?.role?.toLowerCase();
+
+  const isAdmin = userRole === "admin";
+  const isManager = userRole === "manager";
+
   return (
     <nav className="navbar">
       <div className="nav-left">
@@ -22,8 +27,21 @@ function Navbar() {
       <div className="nav-right">
         {user ? (
           <>
-            {user.role === "admin" && <Link to="/admin">Admin</Link>}
+            {isAdmin && <Link to="/admin">Admin</Link>}
+
+            {(isAdmin || isManager) && (
+              <Link to="/admin/orders">Orders</Link>
+            )}
+
+            {isAdmin && (
+              <>
+                <Link to="/admin/users">Users</Link>
+                <Link to="/admin/reports">Reports</Link>
+              </>
+            )}
+
             <Link to="/my-orders">My Orders</Link>
+
             <button className="logout-btn" onClick={logout}>
               Logout
             </button>
