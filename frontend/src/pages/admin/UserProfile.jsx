@@ -1,10 +1,20 @@
-import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+
+import {
+  createUser,
+  getUserById,
+  updateUser
+} from "../../services/userService";
 
 function UserProfile() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
+  const isEditMode = Boolean(id);
 
   const [form, setForm] = useState({
+    username: "",
     full_name: "",
     email: "",
     password: "",
@@ -20,8 +30,12 @@ function UserProfile() {
     tax_verified: false,
     show_payment_section_on_tablet: false,
     pos_quick_service: false,
-    quick_pos_quantity_selection: false
+    quick_pos_quantity_selection: false,
+    is_active: true
   });
+
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const updateField = (field, value) => {
     setForm((prev) => ({
@@ -30,12 +44,136 @@ function UserProfile() {
     }));
   };
 
-  const handleSave = (e) => {
+  useEffect(() => {
+    const loadUser = async () => {
+      if (!isEditMode) return;
+
+      try {
+        setLoading(true);
+
+        const res = await getUserById(id);
+        const user = res.user;
+
+        setForm({
+          username: user.username || "",
+          full_name: user.full_name || "",
+          email: user.email || "",
+          password: "",
+          contact: user.contact || "",
+          assigned_branches: user.assigned_branches || "BROAST CHASERS",
+          default_branch: user.default_branch || "BROAST CHASERS",
+          role: user.role || "Order Taker",
+          discount_cap: user.discount_cap || 0,
+          wrap_categories: Boolean(user.wrap_categories),
+          tablet_user: Boolean(user.tablet_user),
+          show_category_first: Boolean(user.show_category_first),
+          show_service_charges_on_tablet: Boolean(
+            user.show_service_charges_on_tablet
+          ),
+          tax_verified: Boolean(user.tax_verified),
+          show_payment_section_on_tablet: Boolean(
+            user.show_payment_section_on_tablet
+          ),
+          pos_quick_service: Boolean(user.pos_quick_service),
+          quick_pos_quantity_selection: Boolean(
+            user.quick_pos_quantity_selection
+          ),
+          is_active: Boolean(user.is_active)
+        });
+      } catch (error) {
+        console.error("User load error", error);
+        alert("Failed to load user.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUser();
+  }, [id, isEditMode]);
+
+  const validateForm = () => {
+    if (!form.username.trim()) {
+      alert("Username is required.");
+      return false;
+    }
+
+    if (!isEditMode && !form.password.trim()) {
+      alert("Password is required for new user.");
+      return false;
+    }
+
+    if (!form.default_branch.trim()) {
+      alert("Default branch is required.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const buildPayload = () => {
+    return {
+      username: form.username.trim(),
+      password: form.password,
+      full_name: form.full_name,
+      email: form.email,
+      contact: form.contact,
+      role: form.role,
+      assigned_branches: form.assigned_branches,
+      default_branch: form.default_branch,
+      discount_cap: Number(form.discount_cap || 0),
+      wrap_categories: form.wrap_categories,
+      tablet_user: form.tablet_user,
+      show_category_first: form.show_category_first,
+      show_service_charges_on_tablet:
+        form.show_service_charges_on_tablet,
+      tax_verified: form.tax_verified,
+      show_payment_section_on_tablet:
+        form.show_payment_section_on_tablet,
+      pos_quick_service: form.pos_quick_service,
+      quick_pos_quantity_selection:
+        form.quick_pos_quantity_selection,
+      is_active: form.is_active
+    };
+  };
+
+  const handleSave = async (e) => {
     e.preventDefault();
 
-    console.log("User form data:", form);
-    alert("User profile saved locally. Backend connection will be added next.");
+    if (!validateForm()) return;
+
+    try {
+      setSaving(true);
+
+      const payload = buildPayload();
+
+      if (isEditMode) {
+        await updateUser(id, payload);
+        alert("User updated successfully.");
+      } else {
+        await createUser(payload);
+        alert("User created successfully.");
+      }
+
+      navigate("/admin/users");
+    } catch (error) {
+      console.error("User save error", error);
+
+      alert(
+        error?.response?.data?.message ||
+          "Failed to save user."
+      );
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="user-page">
+        <p>Loading user...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="user-page">
@@ -43,7 +181,7 @@ function UserProfile() {
         <div className="user-header-icon">👤</div>
 
         <div>
-          <h1>{id ? "User Profile" : "Add User"}</h1>
+          <h1>{isEditMode ? "User Profile" : "Add User"}</h1>
           <p>Manage account details and access privileges.</p>
         </div>
       </div>
@@ -57,10 +195,16 @@ function UserProfile() {
             </div>
 
             <input
+              placeholder="Username"
+              value={form.username}
+              onChange={(e) => updateField("username", e.target.value)}
+              required
+            />
+
+            <input
               placeholder="Full Name"
               value={form.full_name}
               onChange={(e) => updateField("full_name", e.target.value)}
-              required
             />
 
             <input
@@ -71,11 +215,15 @@ function UserProfile() {
             />
 
             <input
-              placeholder="Password"
+              placeholder={
+                isEditMode
+                  ? "New Password - leave blank to keep current"
+                  : "Password"
+              }
               type="password"
               value={form.password}
               onChange={(e) => updateField("password", e.target.value)}
-              required={!id}
+              required={!isEditMode}
             />
 
             <input
@@ -105,9 +253,22 @@ function UserProfile() {
             <input
               placeholder="Default Branch"
               value={form.default_branch}
-              onChange={(e) => updateField("default_branch", e.target.value)}
+              onChange={(e) =>
+                updateField("default_branch", e.target.value)
+              }
               required
             />
+
+            <label className="checkbox-row">
+              <input
+                type="checkbox"
+                checked={form.is_active}
+                onChange={(e) =>
+                  updateField("is_active", e.target.checked)
+                }
+              />
+              Active User
+            </label>
           </div>
 
           <div className="user-card">
@@ -119,8 +280,11 @@ function UserProfile() {
             <label>Discount Cap %</label>
             <input
               type="number"
+              min="0"
               value={form.discount_cap}
-              onChange={(e) => updateField("discount_cap", e.target.value)}
+              onChange={(e) =>
+                updateField("discount_cap", e.target.value)
+              }
             />
 
             <div className="privilege-grid">
@@ -231,8 +395,12 @@ function UserProfile() {
             </button>
           </Link>
 
-          <button type="submit" className="primary-btn">
-            Save Changes
+          <button
+            type="submit"
+            className="primary-btn"
+            disabled={saving}
+          >
+            {saving ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </form>

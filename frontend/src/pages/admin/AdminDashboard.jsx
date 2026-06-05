@@ -20,6 +20,9 @@ function AdminDashboard() {
 
   const [startDate, setStartDate] = useState(today);
   const [endDate, setEndDate] = useState(today);
+  const [appliedStartDate, setAppliedStartDate] = useState(today);
+  const [appliedEndDate, setAppliedEndDate] = useState(today);
+
   const [branch, setBranch] = useState("BROAST CHASERS");
   const [search, setSearch] = useState("");
   const [orders, setOrders] = useState([]);
@@ -37,6 +40,15 @@ function AdminDashboard() {
     loadOrders();
   }, []);
 
+  const applyFilter = () => {
+    setAppliedStartDate(startDate);
+    setAppliedEndDate(endDate);
+  };
+
+  const printReport = () => {
+    window.print();
+  };
+
   const filteredOrders = useMemo(() => {
     return orders.filter((order) => {
       const orderDate = order.created_at
@@ -44,8 +56,8 @@ function AdminDashboard() {
         : "";
 
       const dateMatch =
-        (!startDate || orderDate >= startDate) &&
-        (!endDate || orderDate <= endDate);
+        (!appliedStartDate || orderDate >= appliedStartDate) &&
+        (!appliedEndDate || orderDate <= appliedEndDate);
 
       const searchText = search.toLowerCase();
 
@@ -58,7 +70,7 @@ function AdminDashboard() {
 
       return dateMatch && searchMatch;
     });
-  }, [orders, startDate, endDate, search]);
+  }, [orders, appliedStartDate, appliedEndDate, search]);
 
   const grossSales = filteredOrders.reduce(
     (sum, order) => sum + Number(order.total_amount || 0),
@@ -106,13 +118,9 @@ function AdminDashboard() {
     }));
   }, [filteredOrders]);
 
-  const printReport = () => {
-    window.print();
-  };
-
   return (
     <div className="dashboard-v2">
-      <div className="dashboard-toolbar">
+      <div className="dashboard-toolbar dashboard-toolbar-top">
         <div className="date-range-box">
           <input
             type="date"
@@ -131,6 +139,7 @@ function AdminDashboard() {
 
         <div className="branch-box">
           <label>Select Branches</label>
+
           <select value={branch} onChange={(e) => setBranch(e.target.value)}>
             <option>BROAST CHASERS</option>
           </select>
@@ -143,9 +152,35 @@ function AdminDashboard() {
           onChange={(e) => setSearch(e.target.value)}
         />
 
+        <button className="dashboard-filter-btn" onClick={applyFilter}>
+          Filter
+        </button>
+
         <button className="dashboard-print-btn" onClick={printReport}>
           🖨 Print
         </button>
+
+        <Link to="/admin/menu-settings">
+          <button className="dashboard-nav-btn">Menu Settings</button>
+        </Link>
+
+        <Link to="/admin/orders">
+          <button className="dashboard-nav-btn outline">View Orders</button>
+        </Link>
+        <Link to="/admin/users">
+          <button className="dashboard-nav-btn">Users</button>
+        </Link>
+        <Link to="/admin/users/new">
+          <button className="dashboard-nav-btn outline">+ Add User</button>
+        </Link>
+        <Link to="/admin/reports">
+          <button className="dashboard-nav-btn outline">Reports</button>
+        </Link>
+      </div>
+
+      <div className="dashboard-applied-date">
+        Showing report from <strong>{appliedStartDate}</strong> to{" "}
+        <strong>{appliedEndDate}</strong>
       </div>
 
       <div className="dashboard-grid-main">
@@ -220,8 +255,8 @@ function AdminDashboard() {
                 <strong>0.00</strong>
               </div>
 
-              <button className="panel-detail-btn">
-                View Details
+              <button className="panel-detail-btn" onClick={printReport}>
+                View Details / Print
               </button>
             </div>
           </div>
@@ -244,12 +279,18 @@ function AdminDashboard() {
                 </thead>
 
                 <tbody>
-                  {orderStatusStats.map((item) => (
-                    <tr key={item.status}>
-                      <td>{item.status}</td>
-                      <td>{item.quantity}</td>
+                  {orderStatusStats.length === 0 ? (
+                    <tr>
+                      <td colSpan="2">No order status found</td>
                     </tr>
-                  ))}
+                  ) : (
+                    orderStatusStats.map((item) => (
+                      <tr key={item.status}>
+                        <td>{item.status}</td>
+                        <td>{item.quantity}</td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -324,51 +365,57 @@ function AdminDashboard() {
           <div className="dashboard-panel chart-panel">
             <h3>Sales Statistics</h3>
 
-            <ResponsiveContainer width="100%" height={320}>
-              <PieChart>
-                <Pie
-                  data={paymentStats}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={120}
-                  label
-                >
-                  {paymentStats.map((_, index) => (
-                    <Cell
-                      key={index}
-                      fill={["#6F2DA8", "#7895CB", "#FFC107", "#25D366"][index % 4]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            {paymentStats.length === 0 ? (
+              <p className="chart-empty">No payment data for selected date.</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={320}>
+                <PieChart>
+                  <Pie
+                    data={paymentStats}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={120}
+                    label
+                  >
+                    {paymentStats.map((_, index) => (
+                      <Cell
+                        key={index}
+                        fill={
+                          [
+                            "#7b2cbf",
+                            "#7895cb",
+                            "#2dce89",
+                            "#fb6340",
+                            "#f5365c"
+                          ][index % 5]
+                        }
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
           </div>
 
           <div className="dashboard-panel chart-panel">
             <h3>Order Status</h3>
 
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={orderStatusStats}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="status" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="quantity" fill="#6F2DA8" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="dashboard-side-actions">
-            <Link to="/admin/menu-settings">
-              <button className="primary-btn">Menu Settings</button>
-            </Link>
-
-            <Link to="/admin/orders">
-              <button className="secondary-btn">View Orders</button>
-            </Link>
+            {orderStatusStats.length === 0 ? (
+              <p className="chart-empty">No order status data for selected date.</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={orderStatusStats}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="status" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="quantity" fill="#7b2cbf" />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>
