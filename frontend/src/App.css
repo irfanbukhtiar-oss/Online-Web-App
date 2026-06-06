@@ -1290,3 +1290,84 @@ td {
     display: none !important;
   }
 }
+
+/* ============================= */
+/* MOBILE CART FIX */
+/* ============================= */
+
+@media (max-width: 768px) {
+  .menu-layout {
+    display: flex;
+    flex-direction: column;
+    padding: 18px 14px;
+  }
+
+  .cart-box {
+    position: sticky;
+    bottom: 0;
+    top: auto;
+    z-index: 100;
+    width: 100%;
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.18);
+    margin-top: 20px;
+    max-height: 55vh;
+    overflow-y: auto;
+  }
+
+  .cart-box h2 {
+    font-size: 20px;
+    margin-top: 0;
+  }
+
+  .cart-item {
+    font-size: 14px;
+  }
+
+  .cart-total {
+    font-size: 18px;
+  }
+
+  .cart-box .primary-btn,
+  .cart-box .secondary-btn,
+  .cart-box button {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .product-card {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    min-height: 130px;
+  }
+
+  .product-image {
+    height: 100%;
+    min-height: 130px;
+  }
+
+  .product-info {
+    padding: 12px;
+  }
+
+  .product-info h3 {
+    font-size: 16px;
+  }
+
+  .product-info p {
+    font-size: 13px;
+  }
+
+  .price {
+    font-size: 16px;
+  }
+
+  body {
+    padding-bottom: 0;
+  }
+}
